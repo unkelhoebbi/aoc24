@@ -1,21 +1,37 @@
+import java.io.File
+import kotlin.math.abs
+
 fun main() {
-    fun part1(input: List<String>): Int {
-        return input.size
+    fun readInput(fileName: String): List<Pair<Int, Int>> {
+        return File("src/$fileName.txt").readLines().map {
+            val (a, b) = it.split("\\s+".toRegex()).map(String::toInt)
+            a to b
+        }
     }
 
-    fun part2(input: List<String>): Int {
-        return input.size
+    fun bubbleSort(list: MutableList<Int>) {
+        val n = list.size
+        for (i in 0 until n - 1) {
+            for (j in 0 until n - i - 1) {
+                if (list[j] > list[j + 1]) {
+                    val temp = list[j]
+                    list[j] = list[j + 1]
+                    list[j + 1] = temp
+                }
+            }
+        }
     }
 
-    // Test if implementation meets criteria from the description, like:
-    check(part1(listOf("test_input")) == 1)
+    fun calculateDifferencesSum(input: List<Pair<Int, Int>>): Int {
+        val list1 = input.map { it.first }.toMutableList()
+        val list2 = input.map { it.second }.toMutableList()
 
-    // Or read a large test input from the `src/Day01_test.txt` file:
-    val testInput = readInput("Day01_test")
-    check(part1(testInput) == 1)
+        bubbleSort(list1)
+        bubbleSort(list2)
 
-    // Read the input from the `src/Day01.txt` file.
+        return list1.indices.sumOf { abs(list1[it] - list2[it]) }
+    }
+
     val input = readInput("Day01")
-    part1(input).println()
-    part2(input).println()
+    println(calculateDifferencesSum(input))
 }
