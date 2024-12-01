@@ -32,6 +32,24 @@ fun main() {
         return list1.indices.sumOf { abs(list1[it] - list2[it]) }
     }
 
+    fun countNumberInList(list: List<Int>, number: Int): Int {
+        return list.count { it == number }
+    }
+
+    fun calculateSimilarityScore(input: List<Pair<Int, Int>>): Int {
+        val list1 = input.map { it.first }.toMutableList()
+        val list2 = input.map { it.second }.toMutableList()
+        val results = mutableListOf<Int>()
+        for (i in list1.indices) {
+            results.add(countNumberInList(list2, list1[i]) * list1[i])
+        }
+        return results.sum()
+    }
+
     val input = readInput("Day01")
+    println("Task 1: Differences Sum")
     println(calculateDifferencesSum(input))
+
+    println("Task 2: Similarity Score")
+    println(calculateSimilarityScore(input))
 }
