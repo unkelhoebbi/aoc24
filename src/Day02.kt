@@ -24,7 +24,7 @@ fun main() {
         return isSafe
     }
 
-    fun searchForSafeReports(input: Array<IntArray>, doTolerate: Boolean = false): Int {
+    fun countSafeReports(input: Array<IntArray>, doTolerate: Boolean = false): Int {
         var safeReports = 0
         input.forEach { array ->
             var isSafe = isReportSafe(array)
@@ -50,8 +50,8 @@ fun main() {
         row.split(" ").map { it.toInt() }.toIntArray()
     }.toTypedArray()
     println("Task 1: Safe Reports")
-    println(searchForSafeReports(intArray))
+    println(countSafeReports(intArray))
 
     println("Task 2: Safe Reports with tolerance")
-    println(searchForSafeReports(intArray, true))
+    println(countSafeReports(intArray, true))
 }
