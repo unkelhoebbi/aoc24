@@ -1,34 +1,45 @@
 import kotlin.math.absoluteValue
 
 fun main() {
-    fun searchForSafeReports(input: Array<IntArray>): Int {
-        var safeReports = 0
-        input.forEach { array ->
-            var previous = array[0]
-            var ascending = 0
-            var descending = 0
-            var invalid = false
-            array.forEachIndexed { index, number ->
-                if (index > 0) {
-                    if ((number - previous).absoluteValue < 1 || (number - previous).absoluteValue > 3) {
-                        invalid = true
-                    } else {
-                        if (number > previous) {
-                            ascending++
-                        } else if (number < previous) {
-                            descending++
-                        }
-                    }
-                    previous = number
+    fun isReportSafe(array: IntArray): Boolean {
+        var ascending = 0
+        var descending = 0
+        var invalid = false
+        for (i in 0 until array.size - 1) {
+            when {
+                (array[i + 1] - array[i]).absoluteValue < 1 || (array[i + 1] - array[i]).absoluteValue > 3 -> {
+                    invalid = true
+                    break
+                }
+
+                array[i] < array[i + 1] -> ascending++
+                array[i] > array[i + 1] -> descending++
+                else -> {
+                    invalid = true
+                    break
                 }
             }
-            if (!invalid) {
-                if (ascending == 0 && descending > 0) {
-                    safeReports++
+        }
+        val isSafe = !invalid && (ascending == 0 && descending > 0 || descending == 0 && ascending > 0)
+        return isSafe
+    }
+
+    fun searchForSafeReports(input: Array<IntArray>, doTolerate: Boolean = false): Int {
+        var safeReports = 0
+        input.forEach { array ->
+            var isSafe = isReportSafe(array)
+            if (!isSafe && doTolerate) {
+                for (i in array.indices) {
+                    val newArray = array.filterIndexed { index, _ -> index != i }.toIntArray()
+                    val isSafeWithTolerance = isReportSafe(newArray)
+                    if (isSafeWithTolerance) {
+                        isSafe = true
+                        break
+                    }
                 }
-                if (descending == 0 && ascending > 0) {
-                    safeReports++
-                }
+            }
+            if (isSafe) {
+                safeReports++
             }
         }
         return safeReports
@@ -40,4 +51,7 @@ fun main() {
     }.toTypedArray()
     println("Task 1: Safe Reports")
     println(searchForSafeReports(intArray))
+
+    println("Task 2: Safe Reports with tolerance")
+    println(searchForSafeReports(intArray, true))
 }
