@@ -1,16 +1,30 @@
 import java.math.BigInteger
 
 fun extractValidOperations(input: List<String>): List<Pair<BigInteger, BigInteger>> {
-    val list: MutableList<Pair<BigInteger, BigInteger>> = mutableListOf()
-    val regex = Regex("mul\\((\\d+),(\\d+)\\)")
-    for (line in input) {
-        val matches = regex.findAll(line)
-        for (match in matches) {
-            val (first, second) = match.destructured
-            list.add(Pair(first.toBigInteger(), second.toBigInteger()))
+    val operations = mutableListOf<String>()
+    val regexMul = Regex("mul\\((\\d+),(\\d+)\\)")
+    val regexDont = Regex("don't\\(\\)")
+    val regexDo = Regex("do\\(\\)")
+
+    val combinedRegex = Regex("mul\\((\\d+),(\\d+)\\)|don't\\(\\)|do\\(\\)")
+    input.forEach { line ->
+        combinedRegex.findAll(line).forEach { operations.add(it.value) }
+    }
+
+    val list = mutableListOf<Pair<BigInteger, BigInteger>>()
+    var mulEnabled = true
+
+    for (operation in operations) {
+        when {
+            regexDont.matches(operation) -> mulEnabled = false
+            regexDo.matches(operation) -> mulEnabled = true
+            regexMul.matches(operation) && mulEnabled -> {
+                val match = regexMul.find(operation)!!
+                val (first, second) = match.destructured
+                list.add(Pair(first.toBigInteger(), second.toBigInteger()))
+            }
         }
     }
-    println(list)
     return list
 }
 
@@ -20,7 +34,8 @@ fun calculateSumOfProducts(pairs: List<Pair<BigInteger, BigInteger>>): BigIntege
 }
 
 fun main() {
-    val input = readInput("Day03")
-    val result = calculateSumOfProducts(extractValidOperations(input))
-    println(result)
+    val extractedPairs = extractValidOperations(readInput("Day03"))
+    println("Extracted pairs: $extractedPairs")
+    val result = calculateSumOfProducts(extractedPairs)
+    println("Sum of products: $result")
 }
