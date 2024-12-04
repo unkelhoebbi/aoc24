@@ -1,47 +1,47 @@
-fun rotate45Degrees(pattern: Array<CharArray>): Array<CharArray> {
-    val result = Array(3) { CharArray(3) { '*' } }
-    result[0][0] = pattern[0][1]
-    result[0][2] = pattern[1][2]
-    result[2][0] = pattern[1][0]
-    result[2][2] = pattern[2][1]
-    result[1][1] = pattern[1][1]
+fun findMatches(grid: Array<CharArray>): Int {
+    val rows = grid.size
+    val cols = grid[0].size
+    var matchCount = 0
 
-    return result
+    for (row in 1 until rows - 1) {
+        for (col in 1 until cols - 1) {
+            if (grid[row][col] == 'A') {
+                // Erstellen einer 3x3-Matrix mit A in der Mitte
+                val matrix = Array(3) { CharArray(3) { '*' } }
+                for (i in -1..1) {
+                    for (j in -1..1) {
+                        matrix[i + 1][j + 1] = grid[row + i][col + j]
+                    }
+                }
+
+                // create strings vor diagonals
+                val mainDiagonal = buildString {
+                    for (i in 0..2) append(matrix[i][i])
+                }
+                val antiDiagonal = buildString {
+                    for (i in 0..2) append(matrix[i][2 - i])
+                }
+
+                val isMainMatch = mainDiagonal.contains("MAS") || mainDiagonal.contains("SAM")
+                val isAntiMatch = antiDiagonal.contains("MAS") || antiDiagonal.contains("SAM")
+
+                if (isMainMatch && isAntiMatch) {
+                    matchCount++
+                }
+            }
+        }
+    }
+
+    println("Total matches found: $matchCount")
+    return matchCount
 }
 
-fun rotate90Degrees(pattern: Array<CharArray>, direction: String): Array<CharArray> {
-    val result = Array(3) { CharArray(3) { '*' } }
-    result[1][1] = pattern[1][1]
-    result[0][1] = pattern[1][2]
-    result[1][0] = pattern[0][1]
-    result[1][2] = pattern[2][1]
-    result[2][1] = pattern[1][0]
-
-    return result
+fun readInputAsCharArray(fileName: String): Array<CharArray> {
+    return readInput(fileName).map { it.toCharArray() }.toTypedArray()
 }
 
 fun main() {
-    val pattern1 = arrayOf(
-        charArrayOf('*', 'M', '*'),
-        charArrayOf('M', 'A', 'S'),
-        charArrayOf('*', 'S', '*')
-    )
+    val grid = readInputAsCharArray("Day04")
 
-    val pattern2 = arrayOf(
-        charArrayOf('*', 'S', '*'),
-        charArrayOf('M', 'A', 'S'),
-        charArrayOf('*', 'M', '*')
-    )
-
-    val patterns = listOf(pattern1, pattern2)
-
-    patterns.forEach { pattern ->
-        println("Original Pattern:")
-        pattern.forEach { println(it.joinToString(" ")) }
-        println("Rotated 45 degrees left:")
-        rotate45Degrees(pattern, "left").forEach { println(it.joinToString(" ")) }
-        println("Rotated 45 degrees right:")
-        rotate45Degrees(pattern, "right").forEach { println(it.joinToString(" ")) }
-        println()
-    }
+    findMatches(grid)
 }
